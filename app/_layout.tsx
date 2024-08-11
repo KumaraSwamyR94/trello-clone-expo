@@ -2,26 +2,55 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
+import * as SecureStorage from "expo-secure-store";
+import { SupabaseProvider } from "@/context/SupabaseContext";
+
+const CLERK_PUBLISHABLE_KEY = process.env
+  .EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string;
+
+// cache the Clerk JWT
+const tokenCache = {
+  async getToken(key: string) {
+    try {
+      return await SecureStorage.getItemAsync(key);
+    } catch (err) {
+      return null;
+    }
+  },
+  async saveToken(key: string, val: string) {
+    try {
+      return SecureStorage.setItemAsync(key, val);
+    } catch (err) {
+      return;
+    }
+  },
+};
 
 const RootLayout = () => {
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{ headerShown: false}} />
-    </Stack>
-  );
-}
-
-const RootLayoutNav = () => {
-  return (
-    <ActionSheetProvider>
-      <>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-        <StatusBar style="light" />
-          <RootLayout />
-        </GestureHandlerRootView>
-      </>
-    </ActionSheetProvider>
+    <SupabaseProvider>
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+      </Stack>
+    </SupabaseProvider>
   );
 };
 
-export default RootLayoutNav
+const RootLayoutNav = () => {
+  return (
+    <ClerkProvider
+      publishableKey={CLERK_PUBLISHABLE_KEY}
+      tokenCache={tokenCache}
+    >
+      <ActionSheetProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <StatusBar style="light" />
+          <RootLayout />
+        </GestureHandlerRootView>
+      </ActionSheetProvider>
+    </ClerkProvider>
+  );
+};
+
+export default RootLayoutNav;

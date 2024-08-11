@@ -12,30 +12,34 @@ import {
 } from "@gorhom/bottom-sheet";
 import { useCallback, useMemo, useRef, useState } from "react";
 import AuthModal from "@/components/AuthModal";
+import { useSupabase } from "@/context/SupabaseContext";
 
 export default function Index() {
   const { top } = useSafeAreaInsets();
   const { showActionSheetWithOptions } = useActionSheet();
+  const { getBoards } = useSupabase();
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const snapPonits = useMemo(() => ["35%"], []);
   const [authType, setAuthType] = useState<ModalType | null>(null);
+
 
   const openLink = () => {
     WebBrowser.openBrowserAsync("https://google.co.in");
   };
 
   const openActionSheet = async () => {
-    const options = ["View Support Docs", "Contact Us", "Cancel"];
-    const cancelButtonIndex = 2;
+    const data = await getBoards!();
+    // const options = ["View Support Docs", "Contact Us", "Cancel"];
+    // const cancelButtonIndex = 2;
 
-    showActionSheetWithOptions(
-      {
-        options,
-        cancelButtonIndex,
-        title: "Help",
-      },
-      (selectedIndex: any) => {}
-    );
+    // showActionSheetWithOptions(
+    //   {
+    //     options,
+    //     cancelButtonIndex,
+    //     title: "Help",
+    //   },
+    //   (selectedIndex: any) => {}
+    // );
   };
 
   const showModal = async (type: ModalType) => {
