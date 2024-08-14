@@ -1,10 +1,11 @@
-import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { ActionSheetProvider } from "@expo/react-native-action-sheet";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
-import * as SecureStorage from "expo-secure-store";
-import { SupabaseProvider } from "@/context/SupabaseContext";
+import { Stack, useRouter, useSegments } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
+import * as SecureStorage from 'expo-secure-store';
+import { SupabaseProvider } from '@/context/SupabaseContext';
+import { useEffect } from 'react';
 
 const CLERK_PUBLISHABLE_KEY = process.env
   .EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string;
@@ -28,10 +29,26 @@ const tokenCache = {
 };
 
 const RootLayout = () => {
+  const router = useRouter();
+  const { isLoaded, isSignedIn } = useAuth();
+  const segment = useSegments()[0];
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    const inAuthGroup = segment === '(authenticated)';
+
+    if (isSignedIn && !inAuthGroup) {
+      router.replace('/(authenticated)/(tabs)/boards');
+    } else if (!isSignedIn) {
+      router.replace('/');
+    }
+  }, [isSignedIn]);
+
   return (
     <SupabaseProvider>
       <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name='index' options={{ headerShown: false }} />
+        <Stack.Screen name='(authenticated)' options={{ headerShown: false }} />
       </Stack>
     </SupabaseProvider>
   );
@@ -41,11 +58,10 @@ const RootLayoutNav = () => {
   return (
     <ClerkProvider
       publishableKey={CLERK_PUBLISHABLE_KEY}
-      tokenCache={tokenCache}
-    >
+      tokenCache={tokenCache}>
       <ActionSheetProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
-          <StatusBar style="light" />
+          <StatusBar style='light' />
           <RootLayout />
         </GestureHandlerRootView>
       </ActionSheetProvider>
