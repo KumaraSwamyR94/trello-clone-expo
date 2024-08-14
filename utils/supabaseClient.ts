@@ -14,23 +14,23 @@ declare global {
 }
 
 function createClerkSupabaseClient() {
-    return createClient(supabaseUrl, supabaseAnonKey, {
-      global: {
-        fetch: async (url, options = {}) => {
-          const clerkToken = await window.Clerk?.session?.getToken({
-            template: 'supabase-trello',
-          });
-  
-          const headers = new Headers(options?.headers);
-          headers.set('Authorization', `Bearer ${clerkToken}`);
-  
-          return fetch(url, {
-            ...options,
-            headers,
-          });
-        },
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    global: {
+      fetch: async (url, options = {}) => {
+        const clerkToken = await window.ClerK.session?.getToken({
+          template: 'supabase-trello',
+        });
+
+        const headers = new Headers(options?.headers);
+        headers.set('Authorization', `Bearer ${clerkToken}`);
+
+        return fetch(url, {
+          ...options,
+          headers,
+        });
       },
-    });
-  }
-  
-  export const client = createClerkSupabaseClient();
+    },
+  });
+}
+
+export const client = createClerkSupabaseClient();
