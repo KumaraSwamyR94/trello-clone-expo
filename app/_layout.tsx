@@ -59,12 +59,12 @@ const RootLayoutNav = () => {
     <ClerkProvider
       publishableKey={CLERK_PUBLISHABLE_KEY}
       tokenCache={tokenCache}>
-      <ActionSheetProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <StatusBar style='light' />
+      <StatusBar style='light' />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ActionSheetProvider>
           <RootLayout />
-        </GestureHandlerRootView>
-      </ActionSheetProvider>
+        </ActionSheetProvider>
+      </GestureHandlerRootView>
     </ClerkProvider>
   );
 };
